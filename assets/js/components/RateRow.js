@@ -1,37 +1,28 @@
 import React from 'react';
-import RateRow from './RateRow';
 
-const RatesTable = ({ rates, todayRates }) => {
-    const calculatePercentageChange = (historicalRate, todayRate) => {
-        if (!historicalRate || !todayRate) return null;
-        return (((todayRate - historicalRate) / historicalRate) * 100).toFixed(2);
-    };
-
+const RateRow = ({ code, rate, todayRate, calculatePercentageChange }) => {
     return (
-        <table className="rates-table">
-            <thead>
-                <tr>
-                    <th>Currency</th>
-                    <th>Currency Name</th>
-                    <th>Buying Rate</th>
-                    <th>Selling Rate</th>
-                    {todayRates && <th>Percentage Change (Buy)</th>}
-                    {todayRates && <th>Percentage Change (Sell)</th>}
-                </tr>
-            </thead>
-            <tbody>
-                {Object.entries(rates).map(([code, rate]) => (
-                    <RateRow
-                        key={code}
-                        code={code}
-                        rate={rate}
-                        todayRate={todayRates ? todayRates[code] : null}
-                        calculatePercentageChange={calculatePercentageChange}
-                    />
-                ))}
-            </tbody>
-        </table>
+        <tr>
+            <td>{code}</td>
+            <td>{rate.name || 'N/A'}</td>
+            <td>{rate.buy !== null ? rate.buy : 'N/A'}</td>
+            <td>{rate.sell !== null ? rate.sell : 'N/A'}</td>
+            {todayRate && (
+                <>
+                    <td>
+                        {rate.buy !== null && todayRate?.buy !== null
+                            ? `${calculatePercentageChange(rate.buy, todayRate.buy)}%`
+                            : 'N/A'}
+                    </td>
+                    <td>
+                        {rate.sell !== null && todayRate?.sell !== null
+                            ? `${calculatePercentageChange(rate.sell, todayRate.sell)}%`
+                            : 'N/A'}
+                    </td>
+                </>
+            )}
+        </tr>
     );
 };
 
-export default RatesTable;
+export default RateRow;

@@ -4,32 +4,22 @@ declare(strict_types=1);
 
 namespace App\Service;
 
-use Symfony\Contracts\HttpClient\HttpClientInterface;
-
-class ExchangeRateService
+class ExchangeRateConstants
 {
-    private const API_URL = 'https://api.nbp.pl/api/exchangerates/rates';
-    private HttpClientInterface $client;
+    public const TABLE_A = 'A';
+    public const TABLE_C = 'C';
 
-    public function __construct(HttpClientInterface $client)
-    {
-        $this->client = $client;
-    }
+    public const CURRENCY_USD = 'usd';
+    public const CURRENCY_EUR = 'eur';
+    public const CURRENCY_CZK = 'czk';
+    public const CURRENCY_IDR = 'idr';
+    public const CURRENCY_BRL = 'brl';
 
-    public function getExchangeRate(string $table, string $currency, string $date): ?array
-    {
-        $url = sprintf('%s/%s/%s/%s/?format=json', self::API_URL, $table, $currency, $date);
-
-        try {
-            $response = $this->client->request('GET', $url);
-
-            if ($response->getStatusCode() === 200) {
-                return $response->toArray();
-            }
-        } catch (\Exception $e) {
-            error_log("Exception when fetching rates: " . $e->getMessage());
-        }
-
-        return null;
-    }
+    public const CURRENCY_TABLE_MAP = [
+        self::CURRENCY_IDR => self::TABLE_A,
+        self::CURRENCY_BRL => self::TABLE_A,
+        self::CURRENCY_USD => self::TABLE_C,
+        self::CURRENCY_EUR => self::TABLE_C,
+        self::CURRENCY_CZK => self::TABLE_C,
+    ];
 }

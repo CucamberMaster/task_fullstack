@@ -4,32 +4,37 @@ declare(strict_types=1);
 
 namespace App\Service;
 
-use Symfony\Contracts\HttpClient\HttpClientInterface;
-
-class ExchangeRateService
+class ExchangeRateFormatter
 {
-    private const API_URL = 'https://api.nbp.pl/api/exchangerates/rates';
-    private HttpClientInterface $client;
-
-    public function __construct(HttpClientInterface $client)
+    public function formatRateResponse(array $rateData, string $table): array
     {
-        $this->client = $client;
-    }
+        $exchangeRate = $rateData['rates'][0];
 
-    public function getExchangeRate(string $table, string $currency, string $date): ?array
-    {
-        $url = sprintf('%s/%s/%s/%s/?format=json', self::API_URL, $table, $currency, $date);
-
-        try {
-            $response = $this->client->request('GET', $url);
-
-            if ($response->getStatusCode() === 200) {
-                return $response->toArray();
-            }
-        } catch (\Exception $e) {
-            error_log("Exception when fetching rates: " . $e->getMessage());
+        if ($table === ExchangeRateConstants::TABLE_C) {
+            return $this->formatCommercialRate($rateData, $exchangeRate);
         }
 
-        return null;
+        return $this->formatStandardRate($rateData, $exchangeRate);
+    }
+
+    private function formatCommercialRate(array $rateData, array $exchangeRate): array
+    {
+        return [
+            'name' => $rateData['currency'],
+            'code' => $rateData['code'],
+            'sell' => number_format($exchangeRate['bid'] + 0.07, 4, '.', ''),
+            'buy' => number_format($exchangeRate['ask'] - 0.05, 4, '.', ''),
+        ];
+    }
+
+    private function formatStandardRate(array $rateData, array $exchangeRate): array
+    {
+        return [
+            'name' => $rateData['currency'],
+            'code' => $rateData['code'],
+            'avg' => number_format($exchangeRate['mid'], 4, '.', ''),
+            'sell' => number_format($exchangeRate['mid'] + 0.15, 4, '.', ''),
+            'buy' => null,
+        ];
     }
 }
