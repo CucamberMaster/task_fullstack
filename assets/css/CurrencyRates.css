@@ -1,6 +1,3 @@
-body {
-    background-color: lightgray;
-}
 .currency-rates-container {
     max-width: 800px;
     margin: auto;
@@ -42,7 +39,7 @@ h1, h2 {
 }
 
 .rates-table th {
-    background-color: #4CAF50; /* Green */
+    background-color: #4CAF50;
     color: white;
 }
 

@@ -10,7 +10,6 @@ class SetupCheckTest extends WebTestCase
     {
         $client = static::createClient();
 
-        // test e.g. the profile page
         $client->request('GET', '/api/setup-check');
         $this->assertResponseIsSuccessful();
         $response = $client->getResponse();
